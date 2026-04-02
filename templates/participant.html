@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Participants</a></li>
+    <li class="breadcrumb-item active"><code>{{ participant_code }}</code></li>
+  </ol>
+</nav>
+
+<div class="mb-3">
+  <h5 class="mb-0">Participant <code>{{ participant_code }}</code></h5>
+  <small class="text-muted">Session: {{ session_code }}</small>
+</div>
+
+<div class="card shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light">
+      <tr>
+        <th>App</th>
+        <th>Round</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rec in recordings %}
+      <tr class="{{ 'table-success' if rec.my_rating else '' }}">
+        <td>{{ rec.app_name }}</td>
+        <td>{{ rec.round_num }}</td>
+        <td>
+          {% if rec.my_rating %}
+            <span class="badge bg-success">Rated</span>
+            {% if not rec.my_rating.usable %}
+              <span class="badge bg-danger ms-1">Not usable</span>
+            {% endif %}
+          {% else %}
+            <span class="badge bg-secondary">Unrated</span>
+          {% endif %}
+        </td>
+        <td class="text-end">
+          <a href="{{ url_for('rate', recording_id=rec.id) }}"
+             class="btn btn-sm {{ 'btn-outline-secondary' if rec.my_rating else 'btn-primary' }}">
+            {{ 'Edit' if rec.my_rating else 'Rate' }}
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

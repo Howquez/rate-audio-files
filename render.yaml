@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: rate-audio-files
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false          # paste your Neon connection string here
+      - key: S3_BUCKET
+        value: ethz-otree-whisper
+      - key: S3_REGION
+        value: eu-north-1
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

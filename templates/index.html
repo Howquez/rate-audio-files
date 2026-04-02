@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h5 class="mb-0">Participants</h5>
+    <small class="text-muted">{{ total_rated }}/{{ total_recordings }} recordings rated by you</small>
+  </div>
+  <div class="d-flex gap-2">
+    <form method="post" action="{{ url_for('sync') }}">
+      <button class="btn btn-outline-secondary btn-sm">Sync S3</button>
+    </form>
+    <a href="{{ url_for('export') }}" class="btn btn-outline-success btn-sm">Export CSV</a>
+  </div>
+</div>
+
+{% if participants %}
+<div class="card shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light">
+      <tr>
+        <th>Participant</th>
+        <th>Session</th>
+        <th style="width:38%">Your progress</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in participants %}
+      {% set done = p.rated == p.total %}
+      <tr class="{{ 'table-success' if done else '' }}">
+        <td><code>{{ p.participant_code }}</code></td>
+        <td><small class="text-muted">{{ p.session_code }}</small></td>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <div class="progress flex-grow-1" style="height:7px">
+              <div class="progress-bar {{ 'bg-success' if done else 'bg-primary' }}"
+                   style="width:{{ (p.rated / p.total * 100)|int if p.total else 0 }}%"></div>
+            </div>
+            <small class="text-muted text-nowrap">{{ p.rated }}/{{ p.total }}</small>
+          </div>
+        </td>
+        <td class="text-end">
+          <a href="{{ url_for('participant', participant_code=p.participant_code) }}"
+             class="btn btn-sm {{ 'btn-outline-secondary' if done else 'btn-primary' }}">
+            {{ 'Review' if done else 'Rate' }}
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% else %}
+<div class="alert alert-info">
+  No recordings loaded yet. Click <strong>Sync S3</strong> to scan the bucket.
+</div>
+{% endif %}
+
+{% endblock %}
